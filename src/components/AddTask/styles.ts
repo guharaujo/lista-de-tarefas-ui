@@ -1,16 +1,14 @@
 import styled from "styled-components";
 
 export const Container = styled.div ` 
-    border: 1px solid #555;
+    width: 800px;
+    height: 25px;
+    border: 2px solid #006400;
     border-radius: 15px;
     padding: 10px;
     margin: 20px 0;
     display: flex;
     align-items: center;
-
-    .image {
-        margin-right: 5px;
-    }
 
     input {
         border: 0px;
@@ -19,5 +17,9 @@ export const Container = styled.div `
         color: #FFF;
         front-size: 18px;
         flex: 1;
+    }
+    button {
+        background-color: #008000;
+        
     }
 `;

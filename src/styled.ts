@@ -11,15 +11,14 @@ export const Area = styled.div`
     margin: auto;
     max-wigth: 980px;
     padding: 10px;
+    
+    
 `;
 
 export const Header = styled.h1`
-    font-family: Helvetica:
-    margin: 0
+    font-family: Helvetica;
+    margin: 10;
     padding: 0;
     color: #FFF;
-    text-align: center;
-    border-bottom: 1px solid #444;
-    padding-bottom: 20px;
-    
+             
 `; 
