@@ -1,5 +1,4 @@
-export type Item = {
+export interface Item {
     id: number;
-    name: string;
-    
+    tasklist: string;
 }

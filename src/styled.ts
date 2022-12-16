@@ -16,6 +16,7 @@ export const Area = styled.div`
 `;
 
 export const Header = styled.h1`
+    width: px;
     font-family: Helvetica;
     margin: 10;
     padding: 0;
