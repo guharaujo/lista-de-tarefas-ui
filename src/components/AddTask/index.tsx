@@ -1,22 +1,30 @@
 import * as G from "./styles";
-import { useState, useCallback, useEffect } from "react";
+import {
+  useState,
+  useCallback,
+  useEffect,
+  FC,
+  Dispatch,
+  SetStateAction,
+} from "react";
 import { Button, Input } from "antd";
 import api from "../../api";
+import { Item } from "../../types/Item";
+import { PlusOutlined } from "@ant-design/icons";
 
-
-export const Task = () => {
+export const Task: FC<{
+  setTasks: Dispatch<SetStateAction<Item[]>>;
+}> = ({ setTasks }) => {
   const [task, setTask] = useState("");
 
   const addTask = useCallback(async () => {
-    console.log(task);
-    const {
-      data: { Item },
-    } = await api.post(`/store`, { tasklist: task });
-  }, [task]);
+    await api.post(`/store`, { tasklist: task });
+    const { data } = await api.get<Item[]>("/index");
+    setTasks(data);
+  }, [task, setTasks]);
 
   return (
     <>
-
       <G.Container>
         <Input
           type="text"
@@ -27,8 +35,8 @@ export const Task = () => {
           value={task}
           onChange={({ target: { value } }) => {
             setTask(value);
-          }}>
-        </Input>
+          }}
+        ></Input>
         <Button
           type="primary"
           onClick={() => {
@@ -37,7 +45,7 @@ export const Task = () => {
           }}
         >
           {" "}
-          ➕{" "}
+          <PlusOutlined />{" "}
         </Button>
       </G.Container>
     </>

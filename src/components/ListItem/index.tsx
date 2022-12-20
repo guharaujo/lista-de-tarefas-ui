@@ -1,25 +1,45 @@
 import { Button, Input, Modal } from "antd";
-import axios from "axios";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, FC } from "react";
 import * as G from "./styles";
 import { Item } from "../../types/Item";
+import api from "../../api";
+import {
+  CheckOutlined,
+  CloseOutlined,
+  DeleteOutlined,
+  EditOutlined,
+} from "@ant-design/icons";
 
-export const List = () => {
+interface Tasks {
+  tasks: Item[];
+}
+
+export const List: FC<Tasks> = ({ tasks }) => {
   const [lista, setListas] = useState<Item[]>([]);
+  const [listaCache, setListasCache] = useState<Item[]>([]);
   const [isEditDisabled, setIsEditDisabled] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const GetData = useCallback(async () => {
-    const { data } = await axios.get<Item[]>("http://localhost:8000/api/index");
+    const { data } = await api.get<Item[]>("/index");
     setListas(data);
+    setListasCache(data);
   }, []);
 
   useEffect(() => {
     GetData();
-  }, []);
+  }, [GetData]);
+
+  useEffect(() => {
+    if (tasks) {
+      setListas(tasks);
+      setListasCache(tasks);
+    }
+  }, [tasks]);
 
   const Delete = (id: number) => {
-    axios.delete(`http://localhost:8000/api/destroy/${id}`);
+    api.delete(`/destroy/${id}`);
+    setListasCache(lista.filter((lista) => lista.id !== id));
     setListas(lista.filter((lista) => lista.id !== id));
     setIsModalOpen(false);
   };
@@ -33,61 +53,70 @@ export const List = () => {
   };
 
   const Edit = (item: Item) => {
-    axios.put(
-      `http://localhost:8000/api/update/?id=${item.id}&name=${item.tasklist}`
-    );
+    api.put(`/update/${item.id}`, {
+      tasklist: item.tasklist,
+    });
+    setListasCache(lista);
   };
 
   return (
     <>
-      {lista.map((val) => (
+      {lista.map((val, index) => (
         <G.Container>
           <Input
             type="text"
             id="listTasks"
-          
             disabled={isEditDisabled}
             value={val.tasklist}
             onChange={({ target: { value } }) => {
-              setListas((prevObj) => {
-                prevObj.map((v) => {
-                  if (v.id === val.id) {
+              setListas((prev) => {
+                return prev.map((v, ind) => {
+                  if (index === ind) {
                     v.tasklist = value;
                   }
+                  return v;
                 });
-                return { ...prevObj };
               });
             }}
           ></Input>
           {isEditDisabled ? (
             <Button type="primary" onClick={() => setIsEditDisabled(false)}>
               {" "}
-              📝{" "}
+              <EditOutlined />{" "}
             </Button>
           ) : (
-            <Button
-              type="primary"
-              onClick={() => {
-                Edit(val);
-                setIsEditDisabled(true);
-              }}
-            >
-              {" "}
-              +{" "}
-            </Button>
+            <>
+              <Button
+                type="primary"
+                onClick={() => {
+                  Edit(val);
+                  setIsEditDisabled(true);
+                }}
+              >
+                {" "}
+                <CheckOutlined />{" "}
+              </Button>
+              <Button
+                type="primary"
+                onClick={() => {
+                  setIsEditDisabled(true);
+                  setListas(listaCache);
+                }}
+              >
+                <CloseOutlined />
+              </Button>
+            </>
           )}
-          <Button type="primary" onClick={showModal} >
-            ❌{" "}
+          <Button type="primary" onClick={showModal}>
+            <DeleteOutlined />{" "}
           </Button>
-          
+
           <Modal
             title="Deseja excluir?"
             open={isModalOpen}
-            onOk={() => Delete(val.id) }
+            onOk={() => Delete(val.id)}
             onCancel={handleCancel}
-          >
-            
-          </Modal>
+          ></Modal>
         </G.Container>
       ))}
     </>
